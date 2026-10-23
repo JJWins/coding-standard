@@ -17,7 +17,7 @@ Rules live under [`.cursor/rules/`](./.cursor/rules/README.md) and are organized
 
 Depending on the tool your project uses:
 
-- **Cursor**: Copy the `core/`, `quality/`, and relevant `stacks/` rules into your project's `.cursor/rules/` folder, then add your repository's rules under `.cursor/rules/project/`. See [`.cursor/rules/README.md`](./.cursor/rules/README.md) for the rule file format and frontmatter options.
+- **Cursor**: Copy the `.cursor/rules/` folder from the branch that matches the project. `main` contains the shared rules. A product branch, such as `Product/Fibi`, also contains that project's rules. See [`.cursor/rules/README.md`](./.cursor/rules/README.md) for how to use them in the IDE.
 - **Agent Instructions (`AGENTS.md`)**: Reference or include these rules in the root `AGENTS.md` file of your repository.
 - **Other Assistants**: Adapt the markdown rules into your assistant's instruction file.
 

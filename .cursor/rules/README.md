@@ -6,7 +6,7 @@ This directory holds the rule files used to guide AI coding assistants in our pr
 
 Project rules are read from `.cursor/rules/` in the open workspace and included in Agent chat. Cursor Tab and inline edit do not use them. Only `.mdc` files are loaded; this README is documentation and is not sent to the Agent.
 
-1. Copy `core/` and `quality/` into the target project's `.cursor/rules/`, then add the `stacks/` rules for that project's languages and the repository-specific files under `project/`. Keep the folder layout and `.mdc` extension.
+1. Copy the `.cursor/rules/` folder from the branch that matches the project into the target project. `main` contains the shared rules. A product branch, such as `Product/Fibi`, also contains that project's rules.
 2. Open the project folder as the Cursor workspace. Rules in a parent folder or another repository are not included.
 3. Open **Customize** in the sidebar, then **Rules**, and confirm each copied rule appears with the expected type: Always Apply, Apply to Specific Files, Apply Intelligently, or Apply Manually.
 4. Start an Agent chat. Cursor includes each rule according to its frontmatter:

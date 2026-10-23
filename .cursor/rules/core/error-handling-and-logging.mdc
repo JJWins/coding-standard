@@ -1,0 +1,47 @@
+---
+description: Core error handling, resilience, deterministic resource cleanup, and structured logging standards across all projects.
+alwaysApply: true
+---
+
+# Error Handling, Resource Cleanup & Logging Standards
+
+Follow these practices to keep error recovery predictable, prevent resource and memory leaks, and maintain actionable production logs.
+
+---
+
+## 1. Exception Handling & Resilience
+
+- **Never Swallow Errors**: Never leave a `catch` block empty or ignore returned error values. Every caught error must be handled/recovered from or wrapped with domain context and rethrown/propagated.
+- **Boundary Error Persistence & Standard Envelopes**:
+  - Wrap unhandled failures in domain/application errors (rather than raw generic runtime exceptions or strings) and rely on global error handlers or HTTP interceptors to persist errors and return a standard client error envelope with appropriate HTTP status codes (never `200 OK` for validation or error failures).
+  - Never expose raw stack traces, internal class/file paths, or database errors to clients.
+  - Do not add redundant catch-log-rethrow blocks at every layer unless adding local recovery, fallback values, retries, or field-level error handling.
+- **Pre-Check Preventable Errors**: Do not catch null-reference or index-out-of-bounds errors that should be prevented with simple null or bounds checks, and never use exceptions for normal control flow.
+- **Tightly Scoped Try Blocks**: Wrap only the statements that can raise the expected error inside a `try` block.
+- **Resilient External & Background Calls**:
+  - Route all outbound HTTP calls through the project's shared HTTP client so authentication, logging, and error interceptors are never bypassed.
+  - Configure explicit timeouts on network/RPC calls, design retriable mutations to be idempotent, and propagate cancellation signals/tokens.
+  - Ensure asynchronous, background-job, and scheduled task handlers explicitly log or surface failures rather than failing silently.
+
+---
+
+## 2. Deterministic Resource & Subscription Cleanup
+
+- **Close I/O Resources Deterministically**: Always close streams, files, database connections, locks, and handles using deterministic language resource-management constructs (`try-with-resources`, `using`, `with`, `defer`, or `finally`).
+- **Never Exit from `finally`**: Never place `return`, `throw`, `break`, or `continue` statements inside a `finally` block, as doing so silently discards exceptions thrown in the `try` block.
+- **Teardown Subscriptions, Timers & Listeners**: Unsubscribe all stream subscriptions, cancellable timers/intervals, and event listeners when a component or scoped service is destroyed. Avoid untracked timers in components or scoped services that continue running after teardown.
+- **Complete Scoped Streams**: Complete or close any reactive stream, channel, or subject owned by a non-singleton (scoped) service in its destroy/dispose lifecycle hook so subscribers are released.
+- **Clear Thread- & Async-Scoped Contexts**: Whenever setting thread-local or async-scoped user/security context on pooled, async, message-listener, or scheduled workers, always clear/reset it in a `finally` block.
+
+---
+
+## 3. Structured Logging Discipline
+
+- **Use the Project Logger**: Always use the application's structured logger (matching the existing module's logger convention when editing legacy files)—never commit standard output prints, raw stack-trace prints, `debugger` breakpoints, or unexplained console diagnostic logs. Any temporary diagnostic log requires an inline comment with a tracking ticket ID and removal condition.
+- **Parameterized & Structured Log Messages**: Always use parameterized placeholders or structured key-value fields instead of string concatenation so disabled log levels incur zero string-building overhead.
+- **Preserve Full Stack Traces**: Whenever logging a caught error locally, pass the full exception/error object (never the message string alone) along with relevant domain identifiers.
+- **Log at the Appropriate Level**:
+  - `ERROR`: Unexpected failures, broken invariants, or exceptions requiring intervention.
+  - `WARN`: Recoverable anomalies, fallback paths, retries, or invalid client states.
+  - `INFO`: Key controller/service entry points and business lifecycle transitions with domain and correlation IDs.
+  - `DEBUG`: Detailed diagnostic state for development and troubleshooting.

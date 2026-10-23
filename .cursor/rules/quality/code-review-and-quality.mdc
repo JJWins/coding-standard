@@ -1,0 +1,48 @@
+---
+description: Pull request review workflow, Blocking vs. Standard severity criteria, build/CI verification, dependency hygiene, and commit/PR standards across all projects.
+alwaysApply: true
+---
+
+# Code Review & Quality Gates
+
+Apply these quality gates when preparing commits, self-reviewing changes, or reviewing pull requests, alongside the standards in `.cursor/rules/core/` and `.cursor/rules/quality/`.
+
+---
+
+## 1. Review Scope & Severity Classification
+
+- **Diff-Scoped Review**: Apply review gates strictly to the files and lines introduced or modified by the PR—do not require refactoring untouched legacy code outside the diff.
+- **Blocking Gates (Must Pass Before Merge)**: Any violation that causes build/test failures, security or authorization flaws, data or financial corruption, transaction or concurrency defects, unhandled resource/memory leaks, or breaks core language safety rules (dynamic code evaluation, leftover debugger breakpoints, legacy function-scoped or shadowed/undeclared variables, coercive equality or reference equality on value/wrapper types, missing control-flow braces or unintended switch fall-through, broken equality/hash or override contracts, hidden field injection, circular dependencies, constructor I/O, or swallowed errors).
+- **Standard Gates (Fix or Justify in PR Comment)**: Conventions, structural patterns, query/performance optimizations, and maintainability expectations (role naming suffixes, member ordering, immutability preference, safe navigation, explicit contract types, guard clauses, thin controllers, HTTP status semantics, read-only/bounded queries, N+1 avoidance, entry-point logging, and code formatting).
+
+---
+
+## 2. Build, Static Analysis & Dependency Gates
+
+- **Blocking**:
+  - **Clean Build & CI Suite**: All modified modules must compile cleanly and pass existing CI test suites with zero errors.
+  - **Zero Linter, Type & Static Analysis Blockers**: Changed files must introduce zero linter errors, compiler/type-checker errors, or Blocker/Critical static analysis issues.
+  - **Lockfile Synchronization**: Whenever a dependency manifest changes, the corresponding lockfile must be updated in the same commit.
+  - **No Unused or Unstable Dependencies**: Remove unused dependencies from manifests and never introduce unstable or prerelease versions (such as `SNAPSHOT`, alpha, or beta) in production builds.
+  - **Shared Module Versioning**: Bump the version of any modified shared internal library/module and update consumer references.
+- **Standard**:
+  - **Version Pinning & Non-Deprecated APIs**: Pin related library families consistently, and do not call deprecated APIs in new code.
+  - **Documented Build & Config Impact**: Justify any new Major static analysis warning, added/removed dependency, new externalized configuration property, or significant bundle/artifact size increase (>50 KB gzipped) in the PR description.
+
+---
+
+## 3. File, Code & Commit Hygiene Gates (Standard)
+
+- **Feature & Layer Encapsulation**: Place new files inside their corresponding feature, shared, or layer folder—never leave loose files at the application root, and do not introduce conflicting sibling route paths.
+- **File Formatting & Cleanliness**:
+  - Follow the project's configured formatter and `.editorconfig` for indentation and line-length limits (defaulting to UTF-8 encoding, spaces-only indentation unless tabs are standard for the language, and a single trailing newline).
+  - Maintain consistent spacing around keywords and operators without manual multi-space column alignment.
+  - Remove trailing whitespace, unused imports, and dead code before committing.
+- **No Unrelated Churn**: Keep each PR scoped to a single ticket/concern and do not reformat untouched files or mix unrelated refactors.
+- **Comments & Tracked TODOs**:
+  - Document public APIs on shared modules and keep comments synchronized when behavior changes.
+  - Include a tracking ticket ID on every `TODO` or `FIXME` comment.
+  - Delete commented-out code unless accompanied by a comment above it with a tracking ticket ID and removal condition.
+- **Commit & PR Format**:
+  - Prefix every commit message and PR title with the ticket ID (e.g., `TICKET-123: concise summary`).
+  - Include the ticket heading, ticket link, summary of changes, verification notes, and any dependency or configuration notes in the PR description.

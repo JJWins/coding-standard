@@ -1,0 +1,54 @@
+---
+description: Frontend UI components, templates, scoped styling, localization, and WCAG 2.2 AA accessibility quality standards.
+globs: **/*.{html,css,scss,sass,less,ts,tsx,js,jsx,vue,svelte}
+alwaysApply: false
+---
+
+# UI, Styling & Accessibility Quality Standards
+
+Apply these standards when building or reviewing frontend components, templates/markup, stylesheets, and localization files.
+
+---
+
+## 1. UI Components, Markup & Performance
+
+- **Blocking**:
+  - **Lazy-Loaded Feature Routes**: Load new feature modules and route trees on demand (code-splitting / lazy loading) rather than eagerly bundling them at startup.
+  - **Pure Render Logic & Formatters**: Keep component render functions, computed properties, and display formatters/pipes pure and stateless—never trigger HTTP calls, state mutations, or event dispatches inside them.
+  - **Safe DOM & Template Access**: Never manipulate the DOM directly via raw browser DOM APIs or imperative DOM libraries inside component or service classes; use declarative framework bindings and expose only intended public members/props to markup.
+  - **Localization File Synchronization**: Whenever a translation key is added, updated, or removed, keep all locale and client translation files synchronized in the same PR.
+- **Standard**:
+  - **Complete Async View States**: Handle **loading**, **empty**, **error**, and **success** states on every view that renders asynchronous data.
+  - **Simple Markup & Consistent Contracts**: Move complex boolean expressions or data transformations out of markup into named helper functions, getters, or computed properties; keep component prop/input/output names consistent without confusing public aliases; validate required inputs; and prefer declarative reactive bindings with automatic lifecycle cleanup for read-only display streams.
+  - **List Rendering & Re-Render Efficiency**: Always supply a stable, unique item key (or tracking function) when rendering lists of objects, use memoized / on-push rendering for heavy list views, restrict route preloading to critical initial-interaction routes, and avoid synchronous array loops inside high-frequency render or lifecycle hooks.
+  - **Externalize User-Facing Text**: Externalize all new user-facing strings and accessible text attributes (`aria-label`, `title`, `placeholder`) into localization resources.
+
+---
+
+## 2. Scoped, Token-Based Styling & Assets
+
+- **Blocking**:
+  - **No Static Inline Styles**: Never use static `style="..."` attributes with hardcoded CSS values in markup (dynamic state bindings are allowed).
+  - **No Unjustified `!important`**: Never use `!important` in stylesheets without a comment explaining which third-party rule is being overridden and why.
+- **Standard**:
+  - **Component-Scoped Styles**: Place component-specific styles in the component's own stylesheet (using the project's standard stylesheet format) rather than global stylesheets, and ensure every CSS class referenced in markup is defined in the component stylesheet or a documented shared stylesheet.
+  - **Design Tokens & Class Selectors**: Reference shared CSS custom properties or design tokens/variables for repeated colors, spacing, and typography; never use ID selectors (`#id`) in component stylesheets; and use declarative class bindings instead of imperative DOM class toggles.
+  - **Optimized Static Assets**: Compress image assets before committing (keep images under 200 KB and prefer SVG/WebP where appropriate).
+
+---
+
+## 3. Accessibility Gates (WCAG 2.2 AA)
+
+- **Blocking**:
+  - **Images**: Provide an `alt` attribute on every `<img>` (descriptive text for informational images, `alt=""` for decorative).
+  - **Buttons, Links & Inputs**: Provide an accessible name (`aria-label` or `aria-labelledby`) on every `<button>`, icon-only link, and input without visible text.
+  - **Form Labels & Validation Errors**: Link every form input to a visible `<label>` via matching `for`/`id`, and link validation error messages to their input via `aria-describedby`.
+  - **Live Status & Toast Alerts**: Mark dynamic toast and status notification containers with `aria-live="polite"` and `aria-atomic="true"`.
+  - **Semantic Data Tables**: Include a `<caption>` and `<th scope="col|row">` headers on all data `<table>` elements.
+  - **Modal Focus Management**: Trap keyboard focus inside modals while open and restore focus to the trigger element when closed.
+  - **Accessible Authentication**: Never introduce login or verification steps that rely on visual/cognitive puzzles (CAPTCHAs) without an accessible alternative.
+- **Standard**:
+  - **Keyboard Operability**: Ensure non-interactive elements (`<div>`, `<span>`) with click handlers also respond to `Enter` and `Space` and carry `role` and `tabindex`.
+  - **Contrast & Target Size**: Maintain ≥ 4.5:1 text contrast (3:1 for large/bold text) and a minimum 24×24 CSS pixel clickable area on interactive controls.
+  - **Focus Visibility & Sticky Headers**: Never remove focus indicators (`outline: none`) without a high-contrast replacement, and ensure focused elements are not obscured behind sticky headers or toolbars.
+  - **Motion, Dragging & Document Structure**: Provide non-drag keyboard/click alternatives for drag-and-drop interactions, make looping animations (>5s) pausable or respect `prefers-reduced-motion`, keep heading levels sequential (`h1` → `h2` → `h3`), and maintain a valid `<html lang>` attribute.

@@ -1,0 +1,34 @@
+---
+description: Automated and manual testing standards covering test prioritization, Arrange-Act-Assert structure, scenario coverage, and determinism across all projects.
+alwaysApply: true
+---
+
+# Testing & Verification Standards
+
+Apply these standards when writing unit, slice, or integration tests and when verifying behavioral changes for pull requests.
+
+---
+
+## 1. Pragmatic Test Prioritization (Standard)
+
+- **High-Priority Coverage**: Prioritize automated unit and integration tests for security-sensitive logic (authentication, authorization, access control) and financial, currency, or budget calculations.
+- **Documented Deferrals**: When automated tests are not added or updated for a behavioral change, document the manual verification steps, test data, and outcomes in the PR description.
+
+---
+
+## 2. Test Structure & Scenario Coverage (Standard)
+
+- **Test Behavior, Not Implementation**: Verify observable outputs, return values, domain state transitions, and business rules rather than internal private method calls so refactoring does not break tests unnecessarily.
+- **Clear Test Structure**: Organize every test using **Arrange – Act – Assert** (or **Given – When – Then**) with descriptive test names that state the scenario and expected outcome.
+- **Comprehensive Scenarios**:
+  - Happy path with valid, realistic domain fixtures.
+  - Boundary conditions and empty, `null`, or zero edge cases.
+  - Invalid inputs, authorization denials, and expected exception/error paths.
+
+---
+
+## 3. Determinism & Isolation (Standard)
+
+- **Order-Independent & Self-Cleaning**: Tests must run independently in any order and clean up their own state.
+- **No Flaky Timing or External Dependencies**: Never rely on fixed sleep delays, wall-clock time, unseeded randomness, or live external network/database connections in unit tests.
+- **Lightweight Test Scope**: Prefer fast, isolated unit or slice tests for domain and service logic, reserving full application-context startup tests for integration wiring verification.

@@ -1,0 +1,88 @@
+---
+description: Core software development principles covering engineering mindset, architecture, naming, control flow, type safety, persistence, and concurrency across all projects.
+alwaysApply: true
+---
+
+# Core Development Principles
+
+Follow these principles across all codebases, languages, and frameworks. Apply stack-specific and project-specific rules alongside these foundations.
+
+---
+
+## 1. Engineering Mindset & Change Discipline
+
+- **Understand Before Changing**: Read surrounding code, trace callers and dependencies, and understand the existing design before making edits.
+- **Follow Existing Conventions**: Match the project's established architecture, naming patterns, interface/implementation split, data-access style, folder layout, and formatting.
+- **Reuse Before Creating**: Search for existing utilities, base entities, shared components, and helpers before writing new ones or adding packages. Place components and utilities shared across multiple features into a shared module rather than duplicating them.
+- **Surgical, Minimal Changes**: Scope edits strictly to the task. Do not refactor unrelated code, reformat untouched files, or add speculative features.
+- **Preserve Contracts**: Never break published method signatures, public APIs, or database schemas in place—deprecate the old signature, add a replacement, and bump versions when modifying shared modules.
+
+---
+
+## 2. Architecture, State & Dependency Injection
+
+- **Single Responsibility (SRP)**: Give every module, class, and function one clear purpose and one reason to change.
+- **Thin Entrypoints & Layer Boundaries**: Keep controllers/entrypoints thin (routing and request/response translation only). Keep business logic in services—never inject data-access objects directly into controllers for business logic or manipulate UI/DOM from services.
+- **Feature State Isolation & Service Scope**: Keep feature-specific state inside dedicated feature services rather than polluting global/common utility services. Register application-wide stateless or shared-state services as root singletons rather than creating isolated instances per caller.
+- **Dependency Direction & No Circularity**: Core and high-level domain modules must never depend on lower-level or feature-specific modules, and no circular dependencies may exist between components or services.
+- **Constructor Injection Only**: Inject collaborators as immutable fields via constructor injection; avoid field or property injection.
+- **No I/O in Constructors**: Constructors must only assign dependencies and initial state—never execute database queries, network calls, or workflow logic in a constructor.
+- **Typed Configuration & Testable Globals**: Group related configuration settings into typed configuration objects rather than scattered property lookups, and abstract platform/environment globals behind injectable interfaces so units remain testable.
+- **KISS, YAGNI, DRY & Composition**: Prefer simple, readable code over clever abstractions. Extract shared logic only when it represents the same canonical business rule, and favor composition and small interfaces over deep inheritance (reserving base classes for true cross-cutting contracts such as standard audit columns).
+
+---
+
+## 3. Code Clarity, Naming & Control Flow
+
+- **Standard Casing & Identifiers**:
+  - Use `UpperCamelCase` (`PascalCase`) nouns for classes, interfaces, and types.
+  - Use `lowerCamelCase` for methods, functions, variables, and parameters.
+  - Use `UPPER_SNAKE_CASE` for module- and class-level fixed constants (keep local immutable variables in `lowerCamelCase`).
+  - Use lowercase for packages and `kebab-case` for feature folders and route paths.
+  - Never start or end identifiers with `_` or `$`, and avoid cryptic abbreviations.
+- **Role Suffixes & Prefixes**: End type and file names with their architectural role (`Controller`, `Service`, `Repository`/`Dao`, `Component`, `Guard`, `DTO`/`VO`, `Exception`, `Test`) and prefix abstract base classes with `Abstract` or `Base`.
+- **Visibility, Ordering & Focused Functions**:
+  - Use the most restrictive practical visibility (`private` by default) and access static members via their declaring type name rather than through instance references.
+  - Order class members predictably: static constants → instance fields → constructors/lifecycle hooks → public methods → private helpers.
+  - Keep functions focused on one task, group > 3–4 parameters into a typed object, and split functions instead of using boolean flag parameters.
+- **Flat, Safe Control Flow**:
+  - Always use curly braces `{}` for `if`, `else`, `for`, `while`, and `do` blocks, even single-line statements.
+  - End every `switch` case with an explicit termination (`break` or `return`) and always include a `default` branch or exhaustive match.
+  - Keep conditional nesting to ≤ 3 levels using guard clauses, and extract complex boolean expressions into named variables or getters.
+  - Chain asynchronous operations cleanly (`async/await` or stream composition) instead of nesting callbacks or subscriptions.
+- **Scope, Immutability & Pure Queries**:
+  - Default to immutable, block-scoped declarations; never use legacy function-scoped declarations (`var`).
+  - Declare local variables before use within a function body, and never shadow outer-scope variables.
+  - Keep getters and display formatters pure and stateless—never trigger network/database calls or state mutations inside them.
+  - Replace magic numbers and repeated string literals with named constants or enums, and use string builders/joiners rather than `+` concatenation inside loops.
+- **Meaningful Comments & Tracked TODOs**: Write comments only to explain *why* (business constraints, trade-offs), document public APIs on shared modules, and include a tracking ticket ID on every `TODO`, `FIXME`, or justified commented-out block.
+
+---
+
+## 4. Type Safety, Contracts & Data Integrity
+
+- **Strict Typing & Explicit Contracts**: Define explicit types/interfaces for all public method signatures, API payloads, and component inputs/outputs (never anonymous inline shapes). Avoid untyped escape hatches (`any`, raw untyped maps)—document the reason inline if unavoidable at a dynamic boundary—and model domain states with enums or union types.
+- **Safe Null & Equality Handling**:
+  - Prefer optional chaining / safe navigation (`?.`) and explicit null guards over forced non-null assertions (`!`).
+  - Use strict (`===`) or null-safe (`Objects.equals`) equality—never loose/coercive equality or reference `==` on boxed/wrapper types.
+  - Use nullable wrapper types on DTOs/VOs when distinguishing between an omitted/unset field (`null`) and a default primitive (`false`, `0`) matters.
+  - Avoid `is` prefixes on boolean wrapper fields when they break JSON or bean serialization.
+- **Object & Entity Contracts**: Explicitly declare implemented interfaces and method override markers. Override equality and hash-code methods together using stable business keys (never include lazy-loaded collections or auto-generate all-field equality on persistence entities), and ensure comparators return `0` for equal elements.
+- **Exact Financial Types**: Always use exact decimal types (`BigDecimal`, `DECIMAL`) for currency, budget, and financial calculations—never `float` or `double`.
+
+---
+
+## 5. Persistence, Performance & Concurrency
+
+- **Transactional & ORM Discipline**:
+  - Wrap multi-step database writes that must succeed together in a transaction.
+  - Place declarative transaction markers only on public, proxy-visible methods (never `private` methods or via self-invocation).
+  - Mark read queries as read-only, and never hold DB transactions open across remote network or file I/O.
+  - Prevent lazy-loading errors outside active transactions, and configure cascade/orphan-removal rules safely so parent or sibling records cannot be wiped.
+- **Query, Memory & Cache Efficiency**:
+  - Prefer portable ORM/query-builder queries with named bind parameters over native SQL; when native SQL is required, list explicit columns (no `SELECT *`) and prefer targeted column updates over full-row updates.
+  - Avoid N+1 queries and never execute DB or HTTP calls inside loops, getters, or UI render passes; use batch lookups/writes and lightweight DTO projections for list queries.
+  - Paginate or bound all list queries consistently, stream/chunk large payloads, and define explicit cache keys and eviction policies (never unbounded mutable static maps).
+- **Safe Collections & Managed Concurrency**:
+  - Never mutate immutable/fixed-size collection views or add/remove elements inside a `foreach` loop over the same collection; pre-size collections when capacity is known and iterate maps via key-value entry views.
+  - Prefer container-managed singletons over hand-rolled double-checked locking, use bounded managed thread pools (never raw unmanaged threads or unbounded pools), use contention-safe random generators under concurrency, and use immutable, thread-safe date/time APIs.

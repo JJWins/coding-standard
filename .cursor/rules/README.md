@@ -10,7 +10,7 @@ Rules are split into folders based on where they apply:
 .cursor/rules/
 ├── core/          # Global rules that apply everywhere (coding style, security, error handling)
 ├── stacks/        # Rules for specific languages, frameworks, or data layers
-├── quality/       # Standards for testing, code reviews, and API contracts
+├── quality/       # Standards for testing, code reviews, UI accessibility, and API contracts
 └── project/       # Rules specific to a single project's architecture and domain
 ```
 
@@ -31,8 +31,8 @@ alwaysApply: false
 ```
 
 - `description`: A short summary so the assistant knows what the file is for.
-- `globs`: File or folder patterns where the rule applies. Leave this out if the rule applies everywhere.
-- `alwaysApply`: Set to `true` for global rules in `core/`. Set to `false` for rules that only apply to certain files or folders.
+- `globs`: File or folder patterns where the rule applies. Leave this out if `alwaysApply` is `true`.
+- `alwaysApply`: Set to `true` for universal rules in `core/` and repo-wide `quality/` gates (such as PR review and testing standards). Set to `false` (with `globs`) for stack-specific or file-scoped rules (such as frontend UI/accessibility checks).
 
 ## Adding Stack Rules (`stacks/`)
 

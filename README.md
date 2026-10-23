@@ -10,8 +10,8 @@ Rules live under [`.cursor/rules/`](./.cursor/rules/README.md) and are organized
 
 - **`core/`**: Global engineering principles, security guardrails, error handling, and logging standards that apply across every project.
 - **`quality/`**: Pull request review gates (`Blocking` vs. `Standard`), testing expectations, and UI/accessibility standards.
-- **`stacks/`**: Conventions for specific languages, frameworks, and data layers, loaded only when working on matching file types.
-- **`project/`**: Rules tailored to an individual product or repository's architecture, shared utilities, and domain workflows.
+- **`stacks/`**: Conventions for a language or framework, including a product's Java, Spring, or Angular rules. These load only when matching files are open.
+- **`project/`**: Repository layout and domain workflow rules that are not tied to a language.
 
 ## Using These Rules
 
@@ -23,7 +23,7 @@ Depending on the tool your project uses:
 
 ## Adding Project-Specific Rules
 
-Shared rules cover general engineering and stack practices, but each project should define its own rules under `.cursor/rules/project/` (or in its dedicated product branch) so the assistant understands how that codebase works:
+Language and framework rules for a product belong in `.cursor/rules/stacks/` on that product's branch. Use `.cursor/rules/project/` for repository layout and domain workflows that are not tied to a language:
 
 1. **Architecture & Layer Boundaries**: Document the folder layout, module responsibilities, and dependency direction (for example, which modules are shared core libraries vs. feature modules).
 2. **Existing Utilities & Base Classes**: List internal services, base entities, auth helpers, request clients, and shared UI components so the assistant reuses them instead of creating duplicates.

@@ -24,9 +24,9 @@ Rules are split into folders based on where they apply:
 ```text
 .cursor/rules/
 ├── core/          # Global rules that apply everywhere (coding style, security, error handling)
-├── stacks/        # Rules for specific languages, frameworks, or data layers
+├── stacks/        # Language and framework rules, including a product's Java or Angular conventions
 ├── quality/       # Standards for testing, code reviews, UI accessibility, and API contracts
-└── project/       # Rules specific to a single project's architecture and domain
+└── project/       # Repository layout and domain workflow rules that are not tied to a language
 ```
 
 ## Rule File Format
@@ -51,7 +51,7 @@ alwaysApply: false
 
 ## Adding Stack Rules (`stacks/`)
 
-Stack rules cover conventions for a specific language, framework, or tool.
+Stack rules cover conventions for a language, framework, or a product's use of that stack. The Fibi Java and Angular rules live here.
 
 - Scope the rule using `globs` so it only loads when working on relevant files, and set `alwaysApply: false`.
 - Skip basic language features the assistant already knows. Focus on our team's preferred libraries, patterns, and conventions.
@@ -59,7 +59,7 @@ Stack rules cover conventions for a specific language, framework, or tool.
 
 ## Adding Project Rules (`project/`)
 
-Project rules explain how an individual repository is put together so new code lands in the right place and reuses existing code.
+Project rules explain repository layout and domain workflows that are not tied to a language or framework, so new code lands in the right place and reuses existing code.
 
 - **Folder layout**: Explain where different layers, modules, and shared components belong.
 - **Existing utilities**: Point out internal helpers (logging, error handling, request clients, shared components) so the assistant uses them instead of writing new ones from scratch.

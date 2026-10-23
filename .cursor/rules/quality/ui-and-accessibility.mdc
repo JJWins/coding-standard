@@ -1,38 +1,38 @@
 ---
 description: Frontend UI components, templates, scoped styling, localization, and WCAG 2.2 AA accessibility quality standards.
-globs: **/*.{html,css,scss,sass,less,ts,tsx,js,jsx}
+globs: **/*.{html,css,scss,sass,less,ts,tsx,js,jsx,vue,svelte}
 alwaysApply: false
 ---
 
 # UI, Styling & Accessibility Quality Standards
 
-Apply these standards when building or reviewing frontend components, templates, stylesheets, and localization files.
+Apply these standards when building or reviewing frontend components, templates/markup, stylesheets, and localization files.
 
 ---
 
-## 1. UI Components, Templates & Performance
+## 1. UI Components, Markup & Performance
 
 - **Blocking**:
-  - **Lazy-Loaded Feature Routes**: Load new feature modules and route trees on demand (lazy loading) rather than eagerly bundling them at startup.
-  - **Pure Display Formatters & Pipes**: Keep display formatters and pipes pure and stateless—never trigger HTTP calls, state mutations, or event dispatches inside them.
-  - **Safe DOM & Template Access**: Never manipulate the DOM directly via browser DOM APIs or imperative DOM libraries (`document.*`, jQuery) inside component or service classes; use declarative framework bindings and reference only `public` members in templates.
+  - **Lazy-Loaded Feature Routes**: Load new feature modules and route trees on demand (code-splitting / lazy loading) rather than eagerly bundling them at startup.
+  - **Pure Render Logic & Formatters**: Keep component render functions, computed properties, and display formatters/pipes pure and stateless—never trigger HTTP calls, state mutations, or event dispatches inside them.
+  - **Safe DOM & Template Access**: Never manipulate the DOM directly via raw browser DOM APIs or imperative DOM libraries inside component or service classes; use declarative framework bindings and expose only intended public members/props to markup.
   - **Localization File Synchronization**: Whenever a translation key is added, updated, or removed, keep all locale and client translation files synchronized in the same PR.
 - **Standard**:
   - **Complete Async View States**: Handle **loading**, **empty**, **error**, and **success** states on every view that renders asynchronous data.
-  - **Simple Templates & Consistent Bindings**: Move complex boolean expressions or computed values out of templates into named component getters/methods, keep input/output names consistent (no public aliasing), guard required inputs on initialization, and prefer declarative async bindings for read-only display streams.
-  - **List Rendering & Change-Detection Efficiency**: Supply a unique item key / `trackBy` function on loops rendering object lists, use memoized / on-push rendering for heavy lists, restrict route preloading to critical initial-interaction modules, and avoid synchronous array loops inside high-frequency lifecycle hooks.
-  - **Externalize User-Facing Text**: Mark all new user-facing strings and accessible text attributes (`aria-label`, `title`, `placeholder`) for internationalization (i18n).
+  - **Simple Markup & Consistent Contracts**: Move complex boolean expressions or data transformations out of markup into named helper functions, getters, or computed properties; keep component prop/input/output names consistent without confusing public aliases; validate required inputs; and prefer declarative reactive bindings with automatic lifecycle cleanup for read-only display streams.
+  - **List Rendering & Re-Render Efficiency**: Always supply a stable, unique item key (or tracking function) when rendering lists of objects, use memoized / on-push rendering for heavy list views, restrict route preloading to critical initial-interaction routes, and avoid synchronous array loops inside high-frequency render or lifecycle hooks.
+  - **Externalize User-Facing Text**: Externalize all new user-facing strings and accessible text attributes (`aria-label`, `title`, `placeholder`) into localization resources.
 
 ---
 
 ## 2. Scoped, Token-Based Styling & Assets
 
 - **Blocking**:
-  - **No Static Inline Styles**: Never use static `style="..."` attributes with hardcoded CSS values in templates (dynamic state bindings are allowed).
+  - **No Static Inline Styles**: Never use static `style="..."` attributes with hardcoded CSS values in markup (dynamic state bindings are allowed).
   - **No Unjustified `!important`**: Never use `!important` in stylesheets without a comment explaining which third-party rule is being overridden and why.
 - **Standard**:
-  - **Component-Scoped Styles**: Place component-specific styles in the component's own stylesheet (using the project's standard stylesheet extension) rather than global stylesheets, and ensure every template CSS class is defined in the component stylesheet or a documented shared stylesheet.
-  - **Design Tokens & Class Selectors**: Reference shared CSS custom properties or preprocessor variables for repeated colors, spacing, and typography; never use ID selectors (`#id`) in component stylesheets; and use declarative class bindings instead of imperative DOM class toggles.
+  - **Component-Scoped Styles**: Place component-specific styles in the component's own stylesheet (using the project's standard stylesheet format) rather than global stylesheets, and ensure every CSS class referenced in markup is defined in the component stylesheet or a documented shared stylesheet.
+  - **Design Tokens & Class Selectors**: Reference shared CSS custom properties or design tokens/variables for repeated colors, spacing, and typography; never use ID selectors (`#id`) in component stylesheets; and use declarative class bindings instead of imperative DOM class toggles.
   - **Optimized Static Assets**: Compress image assets before committing (keep images under 200 KB and prefer SVG/WebP where appropriate).
 
 ---

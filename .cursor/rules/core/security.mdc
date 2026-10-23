@@ -13,7 +13,7 @@ Apply these security guardrails across all application layers, configurations, t
 
 - **Zero Secrets in Repository**: Never commit API keys, passwords, tokens, private keys, or credentials in source code, tests, comments, or rule files. Load them from environment variables or a secret manager.
 - **No Hardcoded Server URLs**: Build all outbound and API URLs from externalized configuration—never hardcode hostnames, IP addresses, or ports.
-- **No Security Bypass in Production**: Never enable debug flags, authentication-bypass switches, CSRF disables, or SSL verification bypasses in production configuration files.
+- **No Security Bypass in Production**: Never enable debug flags, authentication-bypass switches, CSRF disables, or TLS/SSL verification bypasses in production configuration files.
 - **Documented Sanitization Bypasses**: Rely on default framework HTML, URL, and resource sanitization. Never bypass sanitization without an inline comment naming the security reviewer and explaining why the data source is trusted.
 
 ---
@@ -23,16 +23,16 @@ Apply these security guardrails across all application layers, configurations, t
 - **Server-Resolved Identity Only**: Never trust client-supplied identity or audit fields (`userId`, `createdBy`, `updatedBy`) sent in request bodies or query parameters—always resolve the acting user from the server's authenticated session or security context.
 - **Protect All Authenticated Routes & Endpoints**: Configure explicit authentication and authorization guards/middleware on every protected backend endpoint and frontend route. Justify any newly opened public/unauthenticated endpoint in the PR description.
 - **Resource-Level Authorization (Prevent IDOR)**: Verify that the authenticated user is authorized for the specific target resource identifier and domain/module context before reading or mutating data or documents.
-- **Auth Context Propagation**: Forward authentication tokens/headers across internal service-to-service calls, and populate the user security context before executing work on async, message-queue, or scheduled threads.
+- **Auth Context Propagation**: Forward authentication tokens/headers across internal service-to-service calls, and populate the user security context before executing work on async, message-queue, or scheduled workers.
 
 ---
 
 ## 3. Input Validation, Injection & Upload Safety
 
 - **Validate at the API Boundary**: Validate and parse all incoming request payloads, parameters, and headers at the entry boundary using schema or declarative validators.
-- **No Entity Binding or Mass Assignment**: Never bind write requests (`POST`/`PUT`/`PATCH`) directly to persistence/ORM entities. Use dedicated request DTOs and block mass assignment of privileged, workflow, or audit fields (`status`, `role`, `createdBy`).
-- **Parameterized Queries Only**: Always use bind parameters or prepared statements in SQL, ORM queries, and stored procedure calls—never concatenate user inputs or context strings into queries.
-- **No Dynamic Code or Command Execution**: Never use `eval()`, abrupt process termination, or unrestricted OS command/process execution on untrusted inputs.
+- **No Entity Binding or Mass Assignment**: Never bind write requests (`POST`/`PUT`/`PATCH`) directly to persistence/ORM entities. Use dedicated request DTOs/schemas and block mass assignment of privileged, workflow, or audit fields (`status`, `role`, `createdBy`).
+- **Parameterized Queries Only**: Always use bind parameters or prepared statements in SQL, NoSQL, ORM queries, and stored procedure calls—never concatenate user inputs or context strings into queries.
+- **No Dynamic Code or Command Execution**: Never use dynamic code evaluation (`eval` or equivalent), abrupt process termination, or unrestricted OS command/process execution on untrusted inputs.
 - **Outbound URL & File Upload Validation**:
   - Validate file uploads for allowed format/extension, MIME type, and maximum size, and sanitize file paths against directory traversal.
   - Validate outbound request URLs against strict allowlists to prevent Server-Side Request Forgery (SSRF).
@@ -42,6 +42,6 @@ Apply these security guardrails across all application layers, configurations, t
 ## 4. Sensitive Data Protection & Tenant Isolation
 
 - **No Sensitive Data in Logs or Responses**: Never log or return passwords, password hashes, session tokens, cookies, access tokens, or sensitive PII in API responses or log messages.
-- **No Sensitive Data in Plain-Text Browser Storage**: Never store authentication tokens, passwords, or PII in unencrypted browser storage (`localStorage` or `sessionStorage`).
+- **No Sensitive Data in Plain-Text Client Storage**: Never store authentication tokens, passwords, or PII in unencrypted client/browser storage (`localStorage`, `sessionStorage`, or unencrypted local files).
 - **Safe Cryptography**: Use standard, current cryptographic algorithms and cryptographically secure random number generators for security-sensitive tokens and keys.
 - **Configuration-Driven Tenant Logic**: Drive client- or tenant-specific behavior through configuration parameters or feature flags rather than hardcoding tenant identifiers in shared services.

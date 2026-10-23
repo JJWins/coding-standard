@@ -1,0 +1,44 @@
+---
+description: Persistence, transaction, collection, concurrency, and performance rules for Java fibi40
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# fibi40 Java Data and Runtime Safety
+
+## Persistence and transactions
+
+- **BLOCK:** Wrap writes that must succeed together in one transaction.
+- **BLOCK:** Production paths cannot trigger `LazyInitializationException`; fetch or map required data inside the transaction.
+- **BLOCK:** Verify cascade and `orphanRemoval` cannot accidentally delete Proposal, Award, or Budget data.
+- **BLOCK:** Modifying repository queries use `@Modifying`.
+- **BLOCK:** Monetary values use `BigDecimal` and precise database `DECIMAL` types.
+- **WARN:** Prevent N+1 queries with fetch joins, entity graphs, or batching; use DTOs/projections for list/search results.
+- Use named `@Query` parameters. Prefer JPQL/Criteria; necessary native SQL selects explicit columns, never `SELECT *`.
+- Mark read paths `@Transactional(readOnly = true)`. Never hold a DB transaction across remote I/O.
+- Avoid self-invocation that bypasses transactional proxies and generic DAOs that update every column.
+- Explicitly map `IS_*` columns when the Java field omits that prefix.
+
+## Collections and flow
+
+- **BLOCK:** Do not mutate immutable/fixed-size collections or unsupported map views.
+- **BLOCK:** Do not add/remove from a collection during foreach over that collection; use an iterator or `removeIf`.
+- **BLOCK:** Comparators return zero for equal values and remain consistent.
+- **BLOCK:** Classic switch cases terminate deliberately and include `default`; switch expressions require toolchain support.
+- **BLOCK:** Braces are mandatory for all control-flow bodies.
+- **WARN:** Set collection capacity when known and iterate maps through `entrySet()` or `forEach`.
+- Keep nesting to three levels where practical, use guard clauses, and name complex boolean expressions.
+
+## Concurrency and time
+
+- **BLOCK:** Do not create raw threads; use Spring tasks or managed executors.
+- **BLOCK:** Executors must have bounded pools/queues and a rejection policy; reject unbounded cached pools and queues.
+- **BLOCK:** Use `java.time`; never share `SimpleDateFormat`.
+- **BLOCK:** Clear pooled-thread `ThreadLocal` values in `finally`.
+- Prefer Spring-managed singleton beans over hand-written double-checked locking and `ThreadLocalRandom` under contention.
+
+## Scale and caching
+
+- **BLOCK:** Never load an unbounded full table or list on a request thread; paginate.
+- **WARN:** Avoid DB/remote calls in tight loops and large JSON responses.
+- Caches require explicit keys, lifecycle, and eviction.

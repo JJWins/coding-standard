@@ -1,0 +1,43 @@
+---
+description: HTTP, RxJS teardown, routing, state, and performance rules for fibi40-client
+globs: "**/*.ts"
+alwaysApply: false
+---
+
+# fibi40-client Services, RxJS, and Routing
+
+## HTTP and services
+
+- **BLOCK:** Use Angular `HttpClient`; never add `fetch`, `XMLHttpRequest`, `$.ajax`, `$.get`, or `$.post`.
+- **BLOCK:** Build API URLs from `this._commonService.baseUrl`; never hardcode absolute server URLs.
+- Use `catchError` only for feature recovery; do not duplicate generic interceptor toasts.
+- App-wide singleton services use `providedIn: 'root'`, not component providers.
+- Services cannot manipulate DOM through `document` or jQuery.
+- Keep feature state in a dedicated feature service, not `CommonService`.
+- New HTTP calls must preserve interceptor-provided auth, CSRF, and loader headers.
+
+## Subscription lifecycle
+
+- **BLOCK:** Every explicit component `.subscribe()` follows the repository pattern:
+  - Declare `$subscriptions: Subscription[] = [];`.
+  - Push the subscription with `this.$subscriptions.push(...)`.
+  - Implement `OnDestroy`.
+  - Call `subscriptionHandler(this.$subscriptions)` in `ngOnDestroy`.
+  - Explicitly unsubscribe any separately stored subscription.
+- **BLOCK:** A non-singleton service (`@Injectable()` without `providedIn: 'root'`) implements `ngOnDestroy` and completes every `Subject`/`BehaviorSubject`.
+- Remove unused RxJS imports and prefer the async pipe for display-only streams.
+- Never nest `subscribe`; compose with `switchMap`, `concatMap`, `mergeMap`, or an appropriate operator.
+- Put cold HTTP observables in methods, not class fields.
+- Replace component `setTimeout`/`setInterval` with `timer`/`interval` and clean up the subscription.
+
+## Routing
+
+- **BLOCK:** Every new authenticated route has `canActivate: [AuthGuard]` or an equivalent feature guard.
+- Route paths use kebab-case and do not conflict beneath the same parent.
+
+## Performance
+
+- Heavy lists use `trackBy` and should consider `ChangeDetectionStrategy.OnPush`.
+- Never make HTTP calls during `*ngFor` processing or from component getters.
+- Compress assets; do not add uncompressed PNG/JPEG files over 200 KB. Prefer SVG for icons.
+- A synchronous loop in `ngOnChanges` or `ngDoCheck` requires a comment explaining why an observable approach was unsuitable.

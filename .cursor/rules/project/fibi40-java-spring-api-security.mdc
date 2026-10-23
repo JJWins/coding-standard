@@ -1,0 +1,46 @@
+---
+description: Spring, REST, security, logging, and exception rules for the Java fibi40 project
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# fibi40 Spring, API, and Security
+
+## Spring and Lombok
+
+- **BLOCK:** New non-test Spring components use private final collaborators and Lombok `@RequiredArgsConstructor`; never field-inject with `@Autowired`.
+- **BLOCK:** Introduce no circular bean dependencies. Put `@Transactional` only on proxy-visible methods.
+- **BLOCK:** Constructors, including Lombok-generated ones, perform no business logic, DB/HTTP calls, workflow, or I/O.
+- **WARN:** Prefer `@Slf4j` for new classes, but preserve established Log4j2 style instead of creating churn.
+- DTOs/VOs should use appropriate Lombok boilerplate annotations.
+- Never use `@AllArgsConstructor` on Spring beans. Prefer constructor-bound configuration or dedicated `@ConfigurationProperties`.
+- Use correct Spring stereotypes; ensure `@Async` and `@Scheduled` failures are logged or surfaced.
+
+## REST and authorization
+
+- **BLOCK:** Secure new authenticated endpoints and validate request DTOs with `@Valid`/`@Validated`.
+- **BLOCK:** Write APIs must bind DTOs, not JPA entities. Prevent privileged-field mass assignment.
+- **BLOCK:** Authorize access to the actual Proposal, Award, Person, Organization, or other resource; authentication alone is insufficient.
+- **BLOCK:** Never concatenate untrusted input into SQL/JPQL. Uploads require type/size checks and path-traversal protection.
+- **BLOCK:** Never expose or log passwords, hashes, secrets, tokens, or internal stack traces.
+- **WARN:** Match HTTP methods and statuses to semantics, use the standard error envelope, keep controllers thin, and paginate list APIs.
+- Legacy POST `/save` endpoints may remain; explain new endpoints that follow that pattern.
+
+## Java safety and errors
+
+- **BLOCK:** Never commit secrets, swallow exceptions, return from `finally`, call `System.exit`, or allow unrestricted process execution.
+- **BLOCK:** Use `@Override`, compare wrappers with `Objects.equals`/`equals`, override `equals` and `hashCode` together, and close resources with try-with-resources.
+- Entity equality uses stable keys and excludes lazy collections.
+- **WARN:** Avoid deprecated APIs, access static members through their declaring class, use tight visibility, and use `final` where it communicates immutability.
+- Do not break published APIs in place; deprecate and add a replacement.
+- Use wrappers in DTO/VO values when absence is meaningful; entity primitives are valid when null is impossible.
+- Use `StringBuilder`/`StringJoiner` for concatenation in loops.
+
+## Logging and exception handling
+
+- **BLOCK:** DEBUG/TRACE logs use placeholders rather than eager concatenation.
+- **WARN:** Wrap boundary failures in `ApplicationException` or the module equivalent; the global handler may persist details without duplicate local logging.
+- When logging a caught error, include the throwable, not only `getMessage()`.
+- Pre-check null/index conditions, keep try/catch scopes narrow, and do not use exceptions for normal flow.
+- Add no `System.out` or `printStackTrace`; match the module logger style.
+- Use ERROR for unexpected failure, WARN for degraded/recoverable behavior, INFO for significant business events, and DEBUG for diagnostics.

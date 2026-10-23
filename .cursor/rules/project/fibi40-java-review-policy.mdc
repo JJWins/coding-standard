@@ -1,0 +1,46 @@
+---
+description: Java 11 fibi40 PR review policy, build gates, naming, hygiene, and test expectations
+globs: "**/{*.java,pom.xml}"
+alwaysApply: false
+---
+
+# fibi40 Java Review Policy
+
+Apply these rules only to lines and behavior changed by the PR. The project uses Java 11.
+
+- **BLOCK** findings must be fixed before merge; only a tech lead may approve an exception.
+- **WARN** findings must be fixed or explicitly acknowledged in the PR.
+- Missing new tests alone never blocks a PR; every testing rule is WARN.
+
+## Build and dependencies
+
+- **BLOCK:** Touched modules compile, existing CI tests pass, and no new Sonar Blocker/Critical issue is introduced.
+- **BLOCK:** Remove unused dependencies, reject production SNAPSHOTs, and version-bump changed shared artifacts such as `fibi-core` together with consumer references.
+- **WARN:** Justify new Sonar Major issues. Pin versions in properties and use one property for related library families.
+- **WARN:** Externalize and document new configuration. Explain every `pom.xml` dependency change.
+- Do not use Java 17 syntax or APIs until the parent POM upgrades from Java 11.
+
+## Naming and language form
+
+- **BLOCK:** Use UpperCamelCase noun class names, lowerCamelCase methods/parameters/variables, meaningful UPPER_SNAKE_CASE constants, and lowercase packages.
+- **BLOCK:** Identifiers cannot start/end with `_` or `$`; write arrays as `String[] args`.
+- **WARN:** Avoid uncommon abbreviations and magic values; prefer enums for fixed value sets and uppercase `L` for long literals.
+- **WARN:** Name abstract classes `Abstract*`/`Base*`, exceptions `*Exception`, and tests `*Test`.
+- Preserve existing interface plus `*Impl` service/DAO conventions.
+- Nullable `Boolean` fields should avoid an `is` prefix when it breaks Lombok/Jackson mapping; primitive boolean accessors may use `is*`.
+
+## Formatting and documentation
+
+- **WARN:** Use same-line opening braces, operator/control-keyword spacing, UTF-8, at most 120 characters per non-import line, no manual alignment, trailing whitespace, dead imports, or missing final newline.
+- Do not reformat unrelated code. Prefer LF through `.gitattributes`; normalized CRLF is not a blocker.
+- Add Javadoc to new public APIs in shared modules. Update stale comments and remove commented-out code unless a Jira reason exists.
+- `TODO` and `FIXME` comments must reference Jira.
+- Put classes in the correct controller/service/DAO-repository/POJO/DTO/VO package and use consistent suffixes.
+
+## PRs and tests
+
+- **WARN:** Commits start `FIBI-XXXX:`; PR titles use `FIBI-XXXX: Jira ticket title`; descriptions include the Jira link and summary.
+- Keep one Jira ticket or concern per PR. Squashing follows branch policy and is advisory.
+- Prefer automated tests for authorization, compliance, financial, budget, Award amount, and money calculations; documented manual verification is acceptable.
+- Prefer unit tests for pure logic and focused unit/slice tests over `@SpringBootTest`.
+- Tests must be deterministic: no `Thread.sleep`, order dependence, or unrealistic Proposal/Award/Budget/Sponsor fixtures.

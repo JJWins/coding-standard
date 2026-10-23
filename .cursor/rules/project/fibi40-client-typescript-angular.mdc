@@ -1,0 +1,49 @@
+---
+description: TypeScript 4.6 and Angular 14 component conventions for fibi40-client
+globs: "**/*.ts"
+alwaysApply: false
+---
+
+# fibi40-client TypeScript and Angular
+
+Review only changes introduced by the PR.
+
+- **BLOCK** findings prevent merge unless a tech lead approves an exception.
+- **WARN** findings must be fixed or acknowledged with rationale in the PR.
+
+## TypeScript safety
+
+- **BLOCK:** Never use `eval`, committed `debugger`, `var`, loose equality, inner-scope shadowing, or a method-local variable before declaration.
+- Use `const` by default and `let` only for reassignment.
+- **WARN:** Remove `console.log/debug/info/time/timeEnd/trace` or comment why it remains. `console.error`/`warn` are valid for real runtime failures.
+- Prefer optional chaining over non-null assertions.
+- Avoid new `any`; unavoidable uses require `// any: <reason>`.
+- Public service signatures, `@Input`/`@Output`, and shared API shapes need explicit interfaces.
+- Prefer `interface` for object shapes and `type` for unions, intersections, and primitive aliases.
+- Omit redundant inferred primitive annotations. Extract non-obvious numeric literals into named constants.
+- Fixed class/module configuration constants use SCREAMING_SNAKE_CASE; local constants remain camelCase.
+
+## Components and directives
+
+- **BLOCK:** Component selectors use the `app-` prefix and kebab-case.
+- **WARN:** Classes use role suffixes such as `Component`, `Service`, `Pipe`, `Directive`, `Module`, `Guard`, `Interceptor`, or `Resolver`.
+- Prefer `templateUrl`/`styleUrls`; a 1–3-line wrapper may be inline with justification.
+- Implement every lifecycle interface used.
+- Use decorators for inputs, outputs, host listeners, and host bindings; do not alias input/output names.
+- Order static fields, instance fields, lifecycle methods, then other methods.
+- New components should be standalone; justify NgModule declarations.
+- Guard required inputs against null at runtime in `ngOnInit` or `ngOnChanges`.
+- Shared components, pipes, and directives used by multiple features belong in `SharedModule`.
+- Directive selectors use app-prefixed attribute camelCase, such as `[appDragDrop]`.
+
+## Pipes and DOM
+
+- **BLOCK:** Pipe `transform()` is pure and stateless: no HTTP/service effects, state updates, or event dispatch.
+- Pipes implement `PipeTransform`; justify `pure: false`.
+- **BLOCK:** Components cannot mutate DOM through `document.*` or `ElementRef.nativeElement`; use bindings or `Renderer2`. Reading dimensions through `ElementRef` is allowed.
+- Avoid direct `window.*`; inject `DOCUMENT` and use `defaultView`.
+
+## Modules
+
+- **BLOCK:** New feature areas lazy-load with `loadChildren` and dynamic `import()`.
+- Use `data: { preload: true }` only for modules needed in the first one or two post-login interactions.

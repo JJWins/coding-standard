@@ -2,6 +2,21 @@
 
 This directory holds the rule files used to guide AI coding assistants in our projects. The goal is to keep the assistant aligned with how our team writes, structures, and secures code without repeating ourselves in every prompt.
 
+## Using Rules in the Cursor IDE
+
+Project rules are read from `.cursor/rules/` in the open workspace and included in Agent chat. Cursor Tab and inline edit do not use them. Only `.mdc` files are loaded; this README is documentation and is not sent to the Agent.
+
+1. Copy `core/` and `quality/` into the target project's `.cursor/rules/`, then add the `stacks/` rules for that project's languages and the repository-specific files under `project/`. Keep the folder layout and `.mdc` extension.
+2. Open the project folder as the Cursor workspace. Rules in a parent folder or another repository are not included.
+3. Open **Customize** in the sidebar, then **Rules**, and confirm each copied rule appears with the expected type: Always Apply, Apply to Specific Files, Apply Intelligently, or Apply Manually.
+4. Start an Agent chat. Cursor includes each rule according to its frontmatter:
+   - `alwaysApply: true` is included in every Agent chat.
+   - `alwaysApply: false` with `globs` is included when a matching file is open, attached, or being edited.
+   - `alwaysApply: false` with a `description` and no `globs` is included when the Agent decides the description matches the request.
+   - A rule with neither `description` nor `globs` is included only when you mention it.
+5. To force a rule into the current chat, type `@` in the Agent input and select it, for example `@fibi40-java-review-policy`.
+6. If a file-scoped rule is missing from the response, attach the matching source file or mention the rule with `@`, then check **Customize → Rules** to confirm Cursor discovered the file.
+
 ## Folder Structure
 
 Rules are split into folders based on where they apply:

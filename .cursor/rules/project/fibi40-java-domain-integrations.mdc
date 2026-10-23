@@ -1,0 +1,41 @@
+---
+description: fibi40-specific Java identity, document, workflow, messaging, database, and module boundaries
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# fibi40 Java Domain and Integration Rules
+
+## Mandatory project invariants
+
+- **BLOCK:** On HTTP paths, get authentication/audit identity from `AuthenticatedUser`; on async paths, use `UserContext`. Never trust body `personId` or `updateUser`.
+- **BLOCK:** Document operations call `UserDocumentAuthorization.isAuthorized` with the correct `CoreConstants` module code.
+- **BLOCK:** New attachment I/O uses `FileManagementService` with the correct module code; do not bypass DB/filesystem routing with raw `FileData` saves.
+- **BLOCK:** Where `${oracledb}` dual paths exist, keep new native SQL/stored procedures and DB scripts compatible with both MySQL and Oracle.
+- **BLOCK:** ACTIVE Award/IP changes use versioning/workflow; never directly change status.
+- **BLOCK:** Proposal/Award/IP/Service Request mutations affecting search trigger `ElasticSyncOperation` with the correct index/action constants.
+- **BLOCK:** Rabbit, Quartz, and other async entry points populate `UserContext` before authenticated-user-dependent code and clear it afterward.
+- **BLOCK:** Client-specific behavior uses PARAMETER-table flags through `commonDao.getParameterValueAs*`; no hardcoded tenant forks.
+- **BLOCK:** Never log JWTs, `Cookie_Token`, access tokens, or payloads containing them.
+- **BLOCK:** `fibi-core` cannot import domain packages from `fibi-base`, agreement, service request, or similar modules.
+- **BLOCK:** CHAR Y/N entity booleans use `JpaCharBooleanConversion`.
+- **BLOCK:** Audit/business time uses `commonDao.getCurrentTimestamp()` and common timezone-aware conversion, not `new Date()`, system time, or `SimpleDateFormat`.
+- **BLOCK:** A new `permitAll` or wide-open path requires written PR justification, especially for upload/integration endpoints.
+- **BLOCK:** Native SQL and `CallableStatement` code binds all parameters; never concatenate request or authenticated-user fields.
+
+## Established project patterns
+
+- Match each module's DAO style; justify Spring Data JPA inside HibernateTemplate modules.
+- Use `pojo` for entities, `vo` for controller aggregates, and `dto` for narrower transfers; prefer typed objects over new `HashMap` APIs.
+- Reuse `com.polus.core.security.AuthenticatedUser`; preserve module/submodule/workflow keys.
+- Publish through `MessageQServiceRouter`/`MessageQVO` where established, and use `LockService` in modules already using Redis locks.
+- Controllers must not newly inject DAOs for business logic; use services.
+- Add no mutable public static cache/map without lifecycle and eviction.
+- Prefer `CoreConstants.YES` or named constants over repeated `"Y"` and null-safe equality for module/status codes.
+- Batch person/unit lookups and collection delete/save operations.
+- New multipart endpoints call `commonService.checkFileFormat(...)` or the module equivalent.
+- Feign clients forward auth through `FeignClientInterceptor` or equivalent.
+- JPA entities use `@Getter`/`@Setter`, not `@Data`; avoid entity `@Builder`/`@AllArgsConstructor` when they affect Hibernate behavior. These remain valid for DTOs.
+- Response flags use wrapper `Boolean`/`Integer` when absence matters.
+- Controller/service entry points log useful context IDs at INFO.
+- Entities with standard audit columns extend `BaseEntity`/`UpdateTrackableEntity` instead of redeclaring inherited fields.

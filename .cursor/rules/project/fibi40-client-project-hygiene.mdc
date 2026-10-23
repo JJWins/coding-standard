@@ -1,0 +1,48 @@
+---
+description: Build, security, structure, labels, dependency, and PR rules for fibi40-client
+globs: "**/{*.ts,*.html,*.scss,*.xlf,package.json,package-lock.json}"
+alwaysApply: false
+---
+
+# fibi40-client Project Gates
+
+Apply these checks only to PR-introduced changes. BLOCK items require a fix unless a tech lead explicitly approves an exception; WARN items require a fix or written acknowledgement.
+
+## Build and security
+
+- **BLOCK:** `npm run build`, `ng lint`, and `tsc --noEmit` complete without errors caused by the PR.
+- **WARN:** Bundle growth over 50 KB gzipped needs written size and dependency rationale.
+- **BLOCK:** Never commit keys, passwords, tokens, or secrets, including in comments.
+- **BLOCK:** Production environment configuration cannot disable authentication, CSRF, or other security controls.
+- **BLOCK:** Do not store tokens, passwords, PII, SSNs, or similar sensitive data unencrypted in browser storage.
+
+## Files and code hygiene
+
+- Feature folders use kebab-case and files use `feature-name.type.ts`.
+- Keep feature files in their feature folder; do not add loose files under `src/app`.
+- Use existing relative-import conventions. Do not add `@app`/`@src` aliases without updating `tsconfig.json`.
+- Remove trailing whitespace and leave exactly one final newline.
+- Use spaces: four in TypeScript and two in HTML.
+- Use single quotes and semicolons in TypeScript; use double quotes for HTML attributes.
+- Keep lines to 140 characters.
+- Commented-out code needs an adjacent reason and removal condition.
+- `TODO`/`FIXME` comments include a Jira ID, such as `TODO [FIBI-4821]: ...`.
+
+## Dependencies and PR metadata
+
+- **BLOCK:** Every `package.json` change includes the matching `package-lock.json` update in the same commit.
+- Explain each dependency's purpose and preferably its bundle-size impact.
+- Commits start `FIBI-XXXX:`; PR titles use `FIBI-XXXX: Jira ticket title` or a close paraphrase.
+- PR descriptions include the ticket heading, Jira link, and change summary.
+- Keep one Jira ticket or concern per PR; exclude unrelated changes.
+
+## Label synchronization
+
+- **BLOCK:** Keep all nine XLF files synchronized:
+  - `src/labels/labels.xlf`
+  - `src/labels/messages.xlf`
+  - Client label files for JHU, NTU, SMU, MIT, KU, NCBS, and BITS
+- Every `<trans-unit>` ID exists in every file with both `<source>` and `<target>`.
+- A client target may copy the source as fallback, but cannot be absent.
+- Removing a base entry requires removal from every client file in the same PR.
+- Run `npm run create-labels` and compare IDs when labels change.

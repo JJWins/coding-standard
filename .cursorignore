@@ -1,0 +1,76 @@
+# Generalized Cursor ignore file.
+# Copy this to the root of a project. Patterns use .gitignore syntax.
+# Cursor already ignores .gitignore entries and common dependency, lock, and binary files.
+# Patterns here also block Agent, Tab, and @ mentions. Terminal commands can still read these files.
+
+# Secrets and local credentials
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+!**/.env.template
+!**/.env.*.example
+**/*credentials*.json
+**/*secrets*.json
+**/service-account*.json
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.keystore
+**/id_rsa
+**/id_rsa.pub
+**/application-local.properties
+**/application-local.yml
+**/application-local.yaml
+
+# Java and Maven build output
+**/target/
+**/out/
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+
+# Frontend build output and caches
+**/dist/
+**/.angular/
+**/coverage/
+**/.nyc_output/
+**/*.min.js
+**/*.min.css
+**/*.js.map
+**/*.css.map
+
+# Test and report output
+**/surefire-reports/
+**/failsafe-reports/
+**/test-results/
+**/playwright-report/
+**/blob-report/
+
+# Logs and local databases
+**/logs/
+**/*.log
+**/*.log.*
+**/*.h2.db
+**/*.mv.db
+**/*.trace.db
+**/*.sqlite
+**/*.sqlite3
+**/*.dump
+
+# IDE and local tool metadata
+**/.idea/
+**/*.iml
+**/*.ipr
+**/*.iws
+**/.project
+**/.classpath
+**/.settings/
+**/.factorypath
+**/.metadata/
+
+# Project-specific paths
+# Add generated clients, vendor trees, and local data directories below.

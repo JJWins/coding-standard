@@ -1,0 +1,17 @@
+---
+description: Use the local Graphify graph before searching or reading code
+alwaysApply: true
+---
+
+# Graphify
+
+This project has a local Graphify graph at `graphify-out/graph.json`. The graph is built on this machine. Query it through the local `graphify-mcp` server.
+
+- Before the first grep, glob, or file read in a task, call `query_graph` with the task as `question`. Open the files it returns first.
+- Before changing a function, class, or route, call `get_neighbors` for that symbol. If connections exist outside the files you plan to edit, say so in the plan.
+- Use `shortest_path` when you need the path between two symbols.
+- Cite the Graphify result, including the symbol and file path, in the answer.
+- Use grep for an exact string, such as an error message or a config key.
+- If `graphify-out/graph.json` does not exist, say so and ask the user to run `graphify extract . --code-only` in the repository root. Then fall back to grep.
+- If a Graphify call fails, say so, then fall back to grep.
+- After changing code, run `graphify update .` so the local graph matches the working tree.

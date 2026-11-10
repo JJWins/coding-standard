@@ -74,3 +74,5 @@
 
 # Project-specific paths
 # Add generated clients, vendor trees, and local data directories below.
+# Generated local Graphify graph
+graphify-out/
